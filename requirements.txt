@@ -1,0 +1,8 @@
+certifi==2020.4.5.1
+chardet==3.0.4
+idna==2.9
+python-vlc==3.0.7110
+requests==2.23.0
+urllib3==1.25.8
+wcwidth==0.1.9
+yapf==0.29.0

@@ -1,0 +1,15 @@
+language: python
+python:
+- '3.6'
+install:
+- pip install -r requirements.txt
+script: python setup.py test
+deploy:
+  provider: pypi
+  user: ly798
+  true:
+    python: 3.6
+    tags: true
+    branch: master
+  password:
+    secure: DQKyyYpFVxIFjWFMaNenHvBqyIoP+BNFVUHXRjKmoQryivQ7xRBfEknRgzWQjN5ZEutGCwrKI5flBfRl+BwzRdtmSKX8HDTjm0PrwZQuc866cBz2XQoSEZl644peoPSDEXFB9ALBCK4BssnV5zRllMWcR93FR4DJavWBgJ6sj9jrKcrsQNIEcp6D93Xp9/wHy2CdvkxKBfXipOvVR19z75MLxicwSmDwnjk3VaaG9q3ULoHayjGRZtRbhOQWfeHHp3LL0NRaxI2MEBBH0JAFyuqVJAXX8+WqA6q/HW6gJYV4z0CzC4tfBcY4jmNh3eCvhzkO32gh8Mxzxa0L+cDx1biBbXsk/rFCusuqHptQJ5R4kwTL1sYmzHFKAkFs0hZaUTPvEJmrZlbbNJGU1qCq+fmMAEyhA7fkj00PLc5gvNLsd0jfxuRfH5arc/iveG8CsIxouNtnSxH6IZMh4hNJNz0c1QM1gfJJxiWf8n/yNdk7zmZw5g3N99rKkf38fu9uyFkS38p0a9kX8h/rYEMtiG8gXwRtmgWU5JBVFaK50J6TDbvlln9gOiya1uwM/t196fIVAAYP96KiJwdGgnTD+5jbkWrHCPt1s0vb1JG7C1naXh0uCrkI3DiS5jUI+eQx2XOxxf3hMBzdxmghkyCraWeyXSfV3WeGEM9ZISpxaVQ=
