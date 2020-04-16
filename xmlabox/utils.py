@@ -49,3 +49,7 @@ def get_pretty_str(s, cursor, max_len=20):
         tmp += ' ' * (max_len - len(s) - cursor)
 
     return tmp
+
+
+def sec2time(sec):
+    return "%02d:%02d" % divmod(sec, 60)

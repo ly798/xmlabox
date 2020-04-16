@@ -8,7 +8,7 @@ import vlc
 
 from wcwidth import wcswidth
 
-from xmlabox.utils import Stack, get_pretty_str
+from xmlabox.utils import Stack, get_pretty_str, sec2time
 from xmlabox.ximalaya import ximalaya
 from xmlabox.storage import Storage
 from xmlabox.base import Item, User
@@ -287,11 +287,11 @@ class Index():
 
         self.display_info('[音量: %s]' % self.volume, 54, y, 5)
         self.display_info(
-            '[%s%s][%s/%s]' % ('=' * play_progress_bar_len, '-' *
-                               (progress_bar_len - play_progress_bar_len),
-                               getattr(self.current_play, 'time', 0),
-                               getattr(self.current_play, 'length', 0)), x,
-            y + 1, 5)
+            '[%s%s][%s/%s]' %
+            ('=' * play_progress_bar_len, '-' *
+             (progress_bar_len - play_progress_bar_len),
+             sec2time(getattr(self.current_play, 'time', 0)),
+             sec2time(getattr(self.current_play, 'length', 0))), x, y + 1, 5)
 
     def _display_exit_window(self):
         x = 25
