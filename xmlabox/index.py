@@ -62,7 +62,7 @@ class Index():
         self.storage = Storage()
         self.user = User(None)
         # 正在播放的章节对象
-        self.current_play = self.storage.get_current_play()
+        self.current_play = self.storage.current_play
 
         self._set_cookie()
         self._valid_login()
@@ -85,13 +85,7 @@ class Index():
         self.ishelp = False
         self.isexit = False
 
-        self.player = Player()
-        self.player.add_callback(vlc.EventType.MediaPlayerEndReached,
-                                 self.play_next_cb)
-        self.player.add_callback(vlc.EventType.MediaPlayerPositionChanged,
-                                 self.update_time)
-        self.volume = 0
-        self.player.set_volume(50)
+        self._init_player()
 
         # 是否下一首
         self.is_next = 0
@@ -101,21 +95,32 @@ class Index():
         # 分页类型: 0 -> history; 1 -> track 分页类型不同，所调用的获取下一页内容方法不同
         self.page_type = 0
 
+    def _init_player(self):
+        LOG.debug('init vlc player')
+        self.player = Player()
+        # 新建vlc对象后在未播放前都获取的音量均为0，从之前的记录中获取并设置
+        self.player.set_volume(self.storage.volume)
+        self.player.add_callback(vlc.EventType.MediaPlayerEndReached,
+                                 self.play_next_cb)
+        self.player.add_callback(vlc.EventType.MediaPlayerPositionChanged,
+                                 self.update_time)
+
     def _set_cookie(self):
         tmp_cookie_file = '/tmp/_xmla_cookie'
-        if self.storage.get_cookie():
+        if self.storage.cookie:
             return
         if not os.path.exists(tmp_cookie_file):
             return
         with open(tmp_cookie_file, 'r') as f:
             cookie = f.read().strip()
             LOG.debug('discover tmp cookie file, set cookie: %s' % cookie)
-            self.storage.set_cookie(cookie)
+            self.storage.cookie = cookie
+            self.storage.save()
 
     def _valid_login(self):
-        LOG.debug('get cookie: %s' % self.storage.get_cookie())
-        if self.storage.get_cookie():
-            self.ximalaya = ximalaya(self.storage.get_cookie())
+        LOG.debug('get cookie: %s' % self.storage.cookie)
+        if self.storage.cookie:
+            self.ximalaya = ximalaya(self.storage.cookie)
             self.user = self.ximalaya.get_current_user()
             if self.user.is_login():
                 self.islogin = True
@@ -131,7 +136,7 @@ class Index():
                 self.current_play.cursor = self.current_play.cursor + 1 \
                     if self.current_play.cursor < 19 else 0
             # 音量
-            self.volume = self.player.get_volume()
+            self.storage.volume = self.player.get_volume()
 
             time.sleep(1)
 
@@ -188,7 +193,9 @@ class Index():
         if not self.current_play:
             LOG.warn('cannot save the current play object to history file')
             return
-        self.storage.set_current_paly(self.current_play)
+        self.storage.current_paly = self.current_play
+        self.storage.volume = self.player.get_volume()
+        self.storage.save()
         LOG.debug('successfully saved the current play object to history file')
         #TODO: 未生效
         self.ximalaya.commit_process(self.current_play.id,
@@ -287,7 +294,7 @@ class Index():
                 '$ %s' % get_pretty_str(play_display_name, cursor, max_len), x,
                 y, 5)
 
-        self.display_info('[音量: %s]' % self.volume, 54, y, 5)
+        self.display_info('[音量: %s]' % self.storage.volume, 54, y, 5)
         self.display_info(
             '[%s%s][%s/%s]' %
             ('=' * play_progress_bar_len, '-' *
@@ -461,11 +468,11 @@ class Index():
                     self.log_string = '无法播放'
             # 音量
             elif key == ord('+') or key == 43:
-                if self.volume < 100:
-                    self.player.set_volume(self.volume + 1)
+                if self.storage.volume < 100:
+                    self.player.set_volume(self.storage.volume + 1)
             elif key == ord('-') or key == 95:
-                if self.volume > 0:
-                    self.player.set_volume(self.volume - 1)
+                if self.storage.volume > 0:
+                    self.player.set_volume(self.storage.volume - 1)
             # 快进/快退
             elif key == 261:
                 self.player.set_time(self.current_play.time + 3)
