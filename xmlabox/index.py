@@ -54,6 +54,7 @@ class Index():
     ----------------------------------
     """
     def __init__(self):
+        LOG.info('start ximalayabox...')
         self._init_curses()
         # 显示宽
         self.weight = 60
@@ -146,7 +147,6 @@ class Index():
             self.current_play.length = self.player.get_length()
         self.current_play.time = self.player.get_time()
         self.current_play.position = self.player.get_position()
-        LOG.debug('%s %s' % (self.current_play.time, self.current_play.length))
 
     def _init_curses(self):
         # 初始化一个终端
@@ -186,8 +186,10 @@ class Index():
     def save_history(self):
         LOG.debug('save history')
         if not self.current_play:
+            LOG.warn('cannot save the current play object to history file')
             return
         self.storage.set_current_paly(self.current_play)
+        LOG.debug('successfully saved the current play object to history file')
         #TODO: 未生效
         self.ximalaya.commit_process(self.current_play.id,
                                      self.current_play.time)
@@ -347,6 +349,7 @@ class Index():
         self.display_info(self.log_string, log_tmp_x, y + 1, 1)
 
     def _pre_page(self):
+        LOG.debug('skip to previous page')
         if self.page_num == 1:
             self.log_string = '已经是第一页'
         else:
@@ -357,6 +360,7 @@ class Index():
                 self.display_chapter_list(self.select_item, True)
 
     def _next_page(self):
+        LOG.debug('skip to next page')
         if self.page_num == self.pages:
             self.log_string = '已经是最后一页'
         else:
@@ -530,12 +534,11 @@ class Index():
         self.select_index = 0
 
     def _play(self):
-        LOG.debug('start play...')
         if not self.current_play.src:
             self.current_play.src = self.ximalaya.get_track_src(
                 self.current_play.id)
         self.player.set_uri(self.current_play.src)
-        LOG.debug('play: %s, src: %s, time: %s, length: %s, ret: %s' %
+        LOG.debug('start play: %s, src: %s, time: %s, length: %s, ret: %s' %
                   (self.current_play.name, self.current_play.src,
                    self.current_play.time, self.current_play.length,
                    self.player.play()))
