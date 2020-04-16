@@ -254,11 +254,6 @@ class Index():
         if not len(self.current_items):
             self.display_info('什么都没有~~', x, y)
 
-        # 计算总共页数
-        self.all_page_num = len(self.current_items) // num
-        if not len(self.current_items) % num == 0:
-            self.all_page_num += 1
-
         for index in range(len(self.current_items)):
             option = self.current_items[index]
             if self.select_index == index:

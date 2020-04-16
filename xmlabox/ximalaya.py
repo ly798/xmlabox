@@ -2,8 +2,13 @@ import requests
 import time
 import hashlib
 import random
+import logging
+
+from pprint import pprint
 
 from xmlabox.base import Album, Track, User
+
+LOG = logging.getLogger(__name__)
 
 
 class ximalaya(object):
@@ -149,14 +154,17 @@ class ximalaya(object):
         }
 
     def get_next_track(self, id):
-        url = "https://www.ximalaya.com/revision/play/v1/show?id=%s&sort=0&size=2&ptype=1" % id
+        url = "https://www.ximalaya.com/revision/play/v1/show?id=%s&sort=0&size=10&ptype=1" % id
         info = self.session.get(url).json()
-        data = info.get('data').get('tracksAudioPlay')[-1]
-        track = Track(name=data.get('trackName'),
-                      id=data.get('trackId'),
-                      album_name=data.get('albumName'),
-                      album_id=data.get('albumId'),
-                      duration=data.get('duration'))
+        index = -1
+        album_id = -1
+        for i in info.get('data').get('tracksAudioPlay'):
+            if str(i.get('trackId')) == str(id):
+                index = i.get('index')
+                album_id = i.get('albumId')
+        LOG.debug('get next index: %s' % str(index + 1))
+        _tmp = self.get_track_list(album_id, index + 1, 1)
+        track = _tmp.get('data')[0]
         return track
 
     def get_track_token(self, id):
@@ -190,3 +198,13 @@ class ximalaya(object):
         }
         info = self.session.post(url, data=data).json()
         return info
+
+
+if __name__ == "__main__":
+    cookie = ""
+    s = ximalaya(cookie)
+    # pprint(s.get_next_track('143744918').json())
+    pprint(s.get_next_track('143744919').json())
+    # pprint(s.get_track_list('18515643').json())
+    # pprint(s.get_history().json())
+    # pprint(s.get_track_src('132052945').json())
