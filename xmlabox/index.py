@@ -1,4 +1,5 @@
 import curses
+import copy
 import logging
 import time
 import _thread
@@ -56,8 +57,11 @@ class Index():
     def __init__(self):
         LOG.info('start ximalayabox...')
         self._init_curses()
-        # 显示宽
-        self.weight = 60
+        # 显示参数
+        self._x = 10  #起点x
+        self._y = 5  #起点y
+        self.weight = 60  # 宽度
+
         self.islogin = False
         self.storage = Storage()
         self.user = User(None)
@@ -205,8 +209,8 @@ class Index():
         self.screen.addstr(y, x, display_str, curses.color_pair(colorpair))
 
     def display_header(self):
-        x = 10
-        y = 5
+        x = self._x
+        y = self._y
         self.display_info('喜马拉雅', x, y, 1)
 
         if self.user:
@@ -241,22 +245,22 @@ class Index():
         self._display_player()
 
     def _display_comment(self):
-        x = 15
-        y = 10
+        x = self._x + 5
+        y = self._y + 5
         if self.current_items:
             self.display_info(
                 getattr(self.current_items[self.select_index], 'comment'), x,
                 y, 2)
 
     def _display_pagination(self):
-        x = 15
-        y = 23
+        x = self._x + 5
+        y = self._y + 18
         self.display_info('--- %s/%s ---' % (self.page_num, self.pages), x, y,
                           2)
 
     def _display_menu(self):
-        x = 15
-        y = 12
+        x = self._x + 5
+        y = copy.deepcopy(self._y + 7)
         # 每页个数
         num = 10
 
@@ -275,8 +279,8 @@ class Index():
 
     def _display_player(self):
         "进度条"
-        x = 12
-        y = 27
+        x = self._x + 2
+        y = self._y + 22
         progress_bar_len = 40
         play_progress_bar_len = 0
         if self.current_play:
@@ -303,8 +307,8 @@ class Index():
              sec2time(getattr(self.current_play, 'length', 0))), x, y + 1, 5)
 
     def _display_exit_window(self):
-        x = 25
-        y = 15
+        x = self._x + 15
+        y = self._y + 10
         self.display_info('-' * 26, x, y, 3)
         self.display_info('| 确认退出?              |', x, y + 1, 3)
         self.display_info('|%s|' % (' ' * 24), x, y + 2, 3)
@@ -312,8 +316,8 @@ class Index():
         self.display_info('-' * 26, x, y + 4, 3)
 
     def _display_login_window(self):
-        x = 12
-        y = 15
+        x = self._x + 2
+        y = self._y + 10
         self.display_info('-' * 58, x, y, 5)
         self.display_info(
             '|                          请参考                        |', x,
@@ -324,8 +328,8 @@ class Index():
         self.display_info('-' * 58, x, y + 3, 5)
 
     def _display_help(self):
-        x = 30
-        y = 12
+        x = self._x + 20
+        y = self._y + 7
         self.display_info('-' * 27, x, y, 5)
         self.display_info('|%s?%s%s%s|' % (' ' * 9, ' ' * 5, '帮助', ' ' * 6), x,
                           y + 1, 5)
@@ -348,8 +352,8 @@ class Index():
         '''
         <key>   <log>
         '''
-        x = 10
-        y = 30
+        x = self._x
+        y = self._y + 25
         self.display_info('-' * self.weight, x, y)
         self.display_info('select: %s' % self.key, x, y + 1, 1)
         log_tmp_x = x + self.weight - wcswidth(self.log_string)
