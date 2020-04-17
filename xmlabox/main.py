@@ -18,6 +18,8 @@ def log_init():
     root = logging.getLogger()
     level = 'DEBUG'
     root.setLevel(level)
+    logging.getLogger("requests").setLevel(logging.WARNING)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
 
     log_file = '/tmp/xmlabox.log'
     log_max_size = 10 * 1024 * 1024
