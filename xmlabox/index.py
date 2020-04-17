@@ -438,6 +438,7 @@ class Index():
                     if self.islogin:
                         self.save_history()
                     break
+
             # 退出
             elif key == ord('q'):
                 if not self.isexit:
@@ -453,7 +454,6 @@ class Index():
             # 上一页
             elif key == ord('p') or key == curses.KEY_PPAGE:
                 self._pre_page()
-
             # 下一页
             elif key == ord('n') or key == curses.KEY_NPAGE:
                 self._next_page()
@@ -470,13 +470,15 @@ class Index():
                             self._play()
                 else:
                     self.log_string = '无法播放'
+
             # 音量
             elif key == ord('+') or key == 43:
                 if self.storage.volume < 100:
-                    self.player.set_volume(self.storage.volume + 1)
+                    self.player.set_volume(self.storage.volume + 2)
             elif key == ord('-') or key == 95:
                 if self.storage.volume > 0:
-                    self.player.set_volume(self.storage.volume - 1)
+                    self.player.set_volume(self.storage.volume - 2)
+
             # 快进/快退
             elif key == 261:
                 self.player.set_time(self.current_play.time + 3)
