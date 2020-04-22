@@ -483,7 +483,8 @@ class Index():
     def user_logout(self):
         self.islogin = False
         self.user = User(None)
-        self._set_cookie(None)
+        self.storage.cookie = None
+        self.storage.save()
         self.menu_stack.top = {'type': 0, 'items': LOGOUTED_ITEMS}
         self.select_index = 0
 
