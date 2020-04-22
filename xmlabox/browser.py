@@ -5,22 +5,22 @@ from selenium.webdriver.chrome.options import Options
 
 from xmlabox.data import get_chromedriver_path
 
+LOGIN_URL = "https://passport.ximalaya.com/page/web/login?fromUri=http://www.ximalaya.com/my/subscribed"
+
 
 class Brower:
     def __init__(self):
         #TODO: phantomjs or firefox
         #TODO: headless
         driver_path = get_chromedriver_path()
-        print(driver_path)
         chrome_options = Options()
-        chrome_options.add_argument('--window-size=500,680')
+        chrome_options.add_argument('--window-size=500,550')
         chrome_options.add_argument('--disable-images')
+        chrome_options.add_argument('--app=%s' % LOGIN_URL)
         self.driver = webdriver.Chrome(driver_path,
                                        chrome_options=chrome_options)
 
     def get_cookie(self):
-        url = "https://passport.ximalaya.com/page/web/login?fromUri=http://www.ximalaya.com/my/subscribed"
-        self.driver.get(url)
         cookie = ''
         while True:
             time.sleep(1)
