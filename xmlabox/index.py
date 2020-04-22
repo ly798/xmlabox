@@ -14,6 +14,7 @@ from xmlabox.ximalaya import ximalaya
 from xmlabox.storage import Storage
 from xmlabox.base import Item, User
 from xmlabox.player import Player
+from xmlabox.browser import Brower
 
 LOG = logging.getLogger(__name__)
 '''
@@ -109,7 +110,11 @@ class Index():
         self.player.add_callback(vlc.EventType.MediaPlayerPositionChanged,
                                  self.update_time)
 
-    def _set_cookie(self):
+    def _set_cookie(self, cookie=None):
+        if cookie:
+            self.storage.cookie = cookie
+            self.storage.save()
+            return
         tmp_cookie_file = '/tmp/_xmla_cookie'
         if self.storage.cookie:
             return
@@ -239,8 +244,6 @@ class Index():
             self._display_help()
         if self.isexit:
             self._display_exit_window()
-        if not self.islogin:
-            self._display_login_window()
         self._display_pagination()
         self._display_player()
 
@@ -314,18 +317,6 @@ class Index():
         self.display_info('|%s|' % (' ' * 24), x, y + 2, 3)
         self.display_info('| 取消(ESC)  确认(ENTER) |', x, y + 3, 3)
         self.display_info('-' * 26, x, y + 4, 3)
-
-    def _display_login_window(self):
-        x = self._x + 2
-        y = self._y + 10
-        self.display_info('-' * 58, x, y, 5)
-        self.display_info(
-            '|                          请参考                        |', x,
-            y + 1, 5)
-        self.display_info(
-            '| https://github.com/ly798/xmlabox/blob/master/README.md |', x,
-            y + 2, 5)
-        self.display_info('-' * 58, x, y + 3, 5)
 
     def _display_help(self):
         x = self._x + 20
@@ -490,16 +481,22 @@ class Index():
         curses.endwin()
 
     def user_logout(self):
-        # self.user = {}
-        # self.menu_stack.top = {'type': 0, 'items': LOGOUTED_ITEMS}
-        # self.select_index = 0
-        pass
+        self.islogin = False
+        self.user = User(None)
+        self._set_cookie(None)
+        self.menu_stack.top = {'type': 0, 'items': LOGOUTED_ITEMS}
+        self.select_index = 0
 
     def user_login(self):
-        # self.user = {'username': ''}
-        # self.menu_stack.top = {'type': 0, 'items': LOGINED_ITEMS}
-        # self.select_index = 0
-        pass
+        _thread.start_new_thread(self._login, ())
+
+    def _login(self):
+        cookie = Brower().get_cookie()
+        self._set_cookie(cookie)
+        self._valid_login()
+        if self.islogin:
+            self.menu_stack.top = {'type': 0, 'items': LOGINED_ITEMS}
+            self.select_index = 0
 
     def display_collect_list(self):
         """显示收藏列表"""

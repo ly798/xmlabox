@@ -55,7 +55,7 @@ class ximalaya(object):
         # 当前用户
         url = 'https://www.ximalaya.com/revision/main/getCurrentUser'
         info = self.session.get(url).json()
-        data = info.get('data')
+        data = info.get('data', {})
         user = User(username=data.get('nickname', None))
         return user
 

@@ -12,7 +12,9 @@ setup(name=PACKAGE,
       url="https://github.com/ly798/xmlabox",
       include_package_data=True,
       zip_safe=False,
-      install_requires=['setuptools', 'python-vlc', 'requests', 'wcwidth'],
+      install_requires=[
+          'setuptools', 'python-vlc', 'requests', 'wcwidth', 'selenium'
+      ],
       entry_points={
           'console_scripts': ['xmlabox = xmlabox.main:main'],
       },
