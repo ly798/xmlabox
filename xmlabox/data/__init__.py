@@ -8,3 +8,7 @@ folder_path = os.path.abspath(
 
 def get_chromedriver_path():
     return os.path.join(folder_path, 'chromedriver')
+
+
+def get_firefoxdriver_path():
+    return os.path.join(folder_path, 'geckodriver')
