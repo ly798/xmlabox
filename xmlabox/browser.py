@@ -50,10 +50,18 @@ class Brower:
             return 'firefox'
         return None
 
-    def get_cookie(self):
+    def get_cookie(self, index=None):
         cookie = ''
         while True:
             time.sleep(1)
+
+            # 登录中的cursor
+            if index:
+                if index.logining_cursor >= 3:
+                    index.logining_cursor = 1
+                else:
+                    index.logining_cursor += 1
+
             if self.driver.current_url == "https://www.ximalaya.com/my/subscribed/":
                 for i in self.driver.get_cookies():
                     cookie += '%s=%s; ' % (i.get('name'), i.get('value'))

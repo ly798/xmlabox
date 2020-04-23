@@ -100,6 +100,10 @@ class Index():
         # 分页类型: 0 -> history; 1 -> track 分页类型不同，所调用的获取下一页内容方法不同
         self.page_type = 0
 
+        # 是否登录中
+        self.logining = False
+        self.logining_cursor = 3
+
     def _init_player(self):
         LOG.debug('init vlc player')
         self.player = Player()
@@ -264,8 +268,11 @@ class Index():
     def _display_menu(self):
         x = self._x + 5
         y = copy.deepcopy(self._y + 7)
-        # 每页个数
-        num = 10
+
+        # 登录中
+        if self.logining:
+            self.display_info('登录中%s' % ('.' * self.logining_cursor), x, y)
+            return
 
         if not len(self.current_items):
             self.display_info('什么都没有~~', x, y)
@@ -492,12 +499,16 @@ class Index():
         _thread.start_new_thread(self._login, ())
 
     def _login(self):
-        cookie = Brower().get_cookie()
-        self._set_cookie(cookie)
-        self._valid_login()
-        if self.islogin:
-            self.menu_stack.top = {'type': 0, 'items': LOGINED_ITEMS}
-            self.select_index = 0
+        self.logining = True
+        try:
+            cookie = Brower().get_cookie(self)
+            self._set_cookie(cookie)
+            self._valid_login()
+            if self.islogin:
+                self.menu_stack.top = {'type': 0, 'items': LOGINED_ITEMS}
+                self.select_index = 0
+        finally:
+            self.logining = False
 
     def display_collect_list(self):
         """显示收藏列表"""
