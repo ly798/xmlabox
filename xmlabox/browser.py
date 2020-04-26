@@ -7,7 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver import FirefoxOptions
 
-from xmlabox.data import get_chromedriver_path, get_firefoxdriver_path
+from xmlabox.drivers import get_browerdriver_path
 
 LOG = logging.getLogger(__name__)
 LOGIN_URL = "https://passport.ximalaya.com/page/web/login?fromUri=http://www.ximalaya.com/my/subscribed"
@@ -19,19 +19,17 @@ class Brower:
         self._brower = self._get_brower()
         LOG.debug(self._brower)
         if self._brower == 'chrome':
-            driver_path = get_chromedriver_path()
+            driver_path = get_browerdriver_path('chrome')
             _options = ChromeOptions()
             _options.add_argument('--window-size=500,550')
-            # _options.add_argument('--disable-images')
             _options.add_argument('--app=%s' % LOGIN_URL)
             self.driver = webdriver.Chrome(driver_path,
                                            chrome_options=_options)
         elif self._brower == 'firefox':
-            driver_path = get_firefoxdriver_path()
+            driver_path = get_browerdriver_path('firefox')
             _options = FirefoxOptions()
             _options.add_argument('--width=500')
             _options.add_argument('--height=630')
-            # _options.set_preference("permissions.default.image", 2)
             _options.set_preference("browser.urlbar.update1", False)
             self.driver = webdriver.Firefox(executable_path=driver_path,
                                             options=_options)

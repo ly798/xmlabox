@@ -249,7 +249,9 @@ class Index():
         if self.isexit:
             self._display_exit_window()
         self._display_pagination()
-        self._display_player()
+
+        if self.islogin:
+            self._display_player()
 
     def _display_comment(self):
         x = self._x + 5
