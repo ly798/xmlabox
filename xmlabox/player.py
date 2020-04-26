@@ -58,3 +58,11 @@ class Player:
     # 设置音量（0~100）
     def set_volume(self, volume):
         return self.media.audio_set_volume(volume)
+
+    # 获取当前文件播放速率
+    def get_rate(self):
+        return self.media.get_rate()
+
+    # 设置播放速率（如：1.2，表示加速1.2倍播放）
+    def set_rate(self, rate):
+        return self.media.set_rate(rate)

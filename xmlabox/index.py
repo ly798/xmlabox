@@ -107,8 +107,11 @@ class Index():
     def _init_player(self):
         LOG.debug('init vlc player')
         self.player = Player()
+        LOG.debug('set vlc volume: %s' % self.storage.volume)
         # 新建vlc对象后在未播放前都获取的音量均为0，从之前的记录中获取并设置
         self.player.set_volume(self.storage.volume)
+        LOG.debug('set vlc rate: %s' % self.storage.rate)
+        self.player.set_rate(self.storage.rate)
         self.player.add_callback(vlc.EventType.MediaPlayerEndReached,
                                  self.play_next_cb)
         self.player.add_callback(vlc.EventType.MediaPlayerPositionChanged,
@@ -150,6 +153,7 @@ class Index():
                     if self.current_play.cursor < 19 else 0
             # 音量
             self.storage.volume = self.player.get_volume()
+            self.storage.rate = self.player.get_rate()
 
             time.sleep(1)
 
@@ -208,6 +212,7 @@ class Index():
             return
         self.storage.current_paly = self.current_play
         self.storage.volume = self.player.get_volume()
+        self.storage.rate = self.player.get_rate()
         self.storage.save()
         LOG.debug('successfully saved the current play object to history file')
         #TODO: 未生效
@@ -248,9 +253,9 @@ class Index():
             self._display_help()
         if self.isexit:
             self._display_exit_window()
-        self._display_pagination()
 
         if self.islogin:
+            self._display_pagination()
             self._display_player()
 
     def _display_comment(self):
@@ -310,6 +315,8 @@ class Index():
                 '$ %s' % get_pretty_str(play_display_name, cursor, max_len), x,
                 y, 5)
 
+        self.display_info('[速率: %s]' % round(self.storage.rate, 1), 54, y - 1,
+                          5)
         self.display_info('[音量: %s]' % self.storage.volume, 54, y, 5)
         self.display_info(
             '[%s%s][%s/%s]' %
@@ -328,8 +335,8 @@ class Index():
         self.display_info('-' * 26, x, y + 4, 3)
 
     def _display_help(self):
-        x = self._x + 20
-        y = self._y + 7
+        x = self._x + 27
+        y = self._y + 6
         self.display_info('-' * 27, x, y, 5)
         self.display_info('|%s?%s%s%s|' % (' ' * 9, ' ' * 5, '帮助', ' ' * 6), x,
                           y + 1, 5)
@@ -340,26 +347,29 @@ class Index():
                           x, y + 3, 5)
         self.display_info('|%s-%s%s%s|' % (' ' * 9, ' ' * 5, '音量减小', ' ' * 2),
                           x, y + 4, 5)
+        self.display_info('|%s+%s%s%s|' % (' ' * 9, ' ' * 5, '速率增加', ' ' * 2),
+                          x, y + 5, 5)
+        self.display_info('|%s-%s%s%s|' % (' ' * 9, ' ' * 5, '速率减小', ' ' * 2),
+                          x, y + 6, 5)
         self.display_info('|%s>%s%s%s|' % (' ' * 9, ' ' * 5, '快进', ' ' * 6), x,
-                          y + 5, 5)
-        self.display_info('|%s<%s%s%s|' % (' ' * 9, ' ' * 5, '快退', ' ' * 6), x,
-                          y + 6, 5)
-        self.display_info('|%sq%s%s%s|' % (' ' * 9, ' ' * 5, '退出', ' ' * 6), x,
                           y + 7, 5)
-        self.display_info('-' * 27, x, y + 8, 5)
+        self.display_info('|%s<%s%s%s|' % (' ' * 9, ' ' * 5, '快退', ' ' * 6), x,
+                          y + 8, 5)
+        self.display_info('|%sq%s%s%s|' % (' ' * 9, ' ' * 5, '退出', ' ' * 6), x,
+                          y + 9, 5)
+        self.display_info('-' * 27, x, y + 10, 5)
 
     def display_footer(self):
-        '''
-        <key>   <log>
-        '''
         x = self._x
         y = self._y + 25
         self.display_info('-' * self.weight, x, y)
-        self.display_info('select: %s' % self.key, x, y + 1, 1)
+        self.display_info('key: %s' % self.key, x, y + 1, 1)
         log_tmp_x = x + self.weight - wcswidth(self.log_string)
         self.display_info(self.log_string, log_tmp_x, y + 1, 1)
 
     def _pre_page(self):
+        if self.current_meun_type == 0:
+            return
         LOG.debug('skip to previous page')
         if self.page_num == 1:
             self.log_string = '已经是第一页'
@@ -371,6 +381,8 @@ class Index():
                 self.display_chapter_list(self.select_item, True)
 
     def _next_page(self):
+        if self.current_meun_type == 0:
+            return
         LOG.debug('skip to next page')
         if self.page_num == self.pages:
             self.log_string = '已经是最后一页'
@@ -478,6 +490,14 @@ class Index():
             elif key == ord('-') or key == 95:
                 if self.storage.volume > 0:
                     self.player.set_volume(self.storage.volume - 2)
+
+            # 速率
+            elif key == ord(')') or key == 41:
+                if self.storage.rate < 3:
+                    self.player.set_rate(self.storage.rate + 0.1)
+            elif key == ord('(') or key == 40:
+                if self.storage.rate > 0:
+                    self.player.set_rate(self.storage.rate - 0.1)
 
             # 快进/快退
             elif key == 261:
