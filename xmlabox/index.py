@@ -57,11 +57,13 @@ class Index():
     """
     def __init__(self):
         LOG.info('start ximalayabox...')
-        self._init_curses()
         # 显示参数
         self._x = 10  #起点x
         self._y = 5  #起点y
         self.weight = 60  # 宽度
+        self.height = 31
+
+        self._init_curses()
 
         self.islogin = False
         self.storage = Storage()
@@ -169,6 +171,11 @@ class Index():
             self.current_play.length = self.player.get_length()
         self.current_play.time = self.player.get_time()
         self.current_play.position = self.player.get_position()
+
+    def _adjust_postion(self):
+        height, width = self.screen.getmaxyx()
+        self._x = (width // 2 - self.weight // 2) - 1
+        self._y = height // 2 - self.height // 2
 
     def _init_curses(self):
         # 初始化一个终端
@@ -315,9 +322,9 @@ class Index():
                 '$ %s' % get_pretty_str(play_display_name, cursor, max_len), x,
                 y, 5)
 
-        self.display_info('[速率: %s]' % round(self.storage.rate, 1), 54, y - 1,
-                          5)
-        self.display_info('[音量: %s]' % self.storage.volume, 54, y, 5)
+        self.display_info('[速率: %s]' % round(self.storage.rate, 1), x + 42,
+                          y - 1, 5)
+        self.display_info('[音量: %s]' % self.storage.volume, x + 42, y, 5)
         self.display_info(
             '[%s%s][%s/%s]' %
             ('=' * play_progress_bar_len, '-' *
@@ -399,6 +406,8 @@ class Index():
             self.screen.clear()
             self.screen.clrtobot()
             curses.noecho()
+
+            self._adjust_postion()
 
             self.display_header()
             self.display_body()
