@@ -71,7 +71,6 @@ class Index():
         # 正在播放的章节对象
         self.current_play = self.storage.current_play
 
-        self._set_cookie()
         self._valid_login()
 
         # 选择的菜单项编号
@@ -118,22 +117,6 @@ class Index():
                                  self.play_next_cb)
         self.player.add_callback(vlc.EventType.MediaPlayerPositionChanged,
                                  self.update_time)
-
-    def _set_cookie(self, cookie=None):
-        if cookie:
-            self.storage.cookie = cookie
-            self.storage.save()
-            return
-        tmp_cookie_file = '/tmp/_xmla_cookie'
-        if self.storage.cookie:
-            return
-        if not os.path.exists(tmp_cookie_file):
-            return
-        with open(tmp_cookie_file, 'r') as f:
-            cookie = f.read().strip()
-            LOG.debug('discover tmp cookie file, set cookie: %s' % cookie)
-            self.storage.cookie = cookie
-            self.storage.save()
 
     def _valid_login(self):
         LOG.debug('get cookie: %s' % self.storage.cookie)
@@ -533,7 +516,8 @@ class Index():
         self.logining = True
         try:
             cookie = Brower().get_cookie(self)
-            self._set_cookie(cookie)
+            self.storage.cookie = cookie
+            self.storage.save()
             self._valid_login()
             if self.islogin:
                 self.menu_stack.top = {'type': 0, 'items': LOGINED_ITEMS}
