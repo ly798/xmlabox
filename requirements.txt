@@ -3,6 +3,8 @@ chardet==3.0.4
 idna==2.9
 python-vlc==3.0.7110
 requests==2.23.0
+selenium==3.141.0
 urllib3==1.25.8
 wcwidth==0.1.9
+-e git+https://github.com/ly798/xmlabox.git@c74cc650e89a3c73aa4e9828b82d9feff622d54f#egg=xmlabox
 yapf==0.29.0

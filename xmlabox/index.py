@@ -130,7 +130,7 @@ class Index():
         while True:
             # 是否下一首
             if self.is_next == 1:
-                self._play()
+                self._play(isnew=True)
                 self.is_next = 0
             # 标题移动
             if self.current_play and self.player.is_playing():
@@ -341,13 +341,15 @@ class Index():
                           x, y + 5, 5)
         self.display_info('|%s-%s%s%s|' % (' ' * 9, ' ' * 5, '速率减小', ' ' * 2),
                           x, y + 6, 5)
-        self.display_info('|%s>%s%s%s|' % (' ' * 9, ' ' * 5, '快进', ' ' * 6), x,
-                          y + 7, 5)
-        self.display_info('|%s<%s%s%s|' % (' ' * 9, ' ' * 5, '快退', ' ' * 6), x,
-                          y + 8, 5)
+        self.display_info('|%s->%s%s%s|' % (' ' * 8, ' ' * 5, '快进', ' ' * 6),
+                          x, y + 7, 5)
+        self.display_info('|%s<-%s%s%s|' % (' ' * 8, ' ' * 5, '快退', ' ' * 6),
+                          x, y + 8, 5)
+        self.display_info('|%s>%s%s%s|' % (' ' * 9, ' ' * 5, '下一首', ' ' * 4),
+                          x, y + 9, 5)
         self.display_info('|%sq%s%s%s|' % (' ' * 9, ' ' * 5, '退出', ' ' * 6), x,
-                          y + 9, 5)
-        self.display_info('-' * 27, x, y + 10, 5)
+                          y + 10, 5)
+        self.display_info('-' * 27, x, y + 11, 5)
 
     def display_footer(self):
         x = self._x
@@ -436,7 +438,7 @@ class Index():
                     LOG.debug('select meun: %s' % self.select_item)
                     self.current_play = self.select_item
                     self.log_string = 'play %s' % self.select_item.display_name
-                    self._play()
+                    self._play(isnew=True)
                 elif self.current_meun_type == 3:
                     LOG.debug('exit')
                     if self.islogin:
@@ -490,6 +492,10 @@ class Index():
             elif key == ord('(') or key == 40:
                 if self.storage.rate > 0:
                     self.player.set_rate(self.storage.rate - 0.1)
+
+            # 下一首
+            elif key == ord('>') or key == 62:
+                self.play_next_cb(event=None)
 
             # 快进/快退
             elif key == 261:
@@ -570,7 +576,7 @@ class Index():
             self._modify_current_items(tracks.get('data'))
         self.select_index = 0
 
-    def _play(self):
+    def _play(self, isnew=False):
         if not self.current_play.src:
             self.current_play.src = self.ximalaya.get_track_src(
                 self.current_play.id)
@@ -579,5 +585,6 @@ class Index():
                   (self.current_play.name, self.current_play.src,
                    self.current_play.time, self.current_play.length,
                    self.player.play()))
-        self.player.set_time(self.current_play.time)
+        if not isnew:
+            self.player.set_time(self.current_play.time)
         self.save_history()
