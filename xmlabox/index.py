@@ -25,6 +25,7 @@ menu type:
 '''
 # 已登录的可选择项
 LOGINED_ITEMS = [
+    Item('local_history_list', '本地历史', 'display_local_history_list'),
     Item('history_list', '历史记录', 'display_history_list'),
     Item('collect_list', '我的收藏', 'display_collect_list'),
     Item('logout', '退出登陆', 'user_logout'),
@@ -200,7 +201,7 @@ class Index():
         if not self.current_play:
             LOG.warn('cannot save the current play object to history file')
             return
-        self.storage.current_paly = self.current_play
+        self.storage.add_current_play(self.current_play)
         self.storage.volume = self.player.get_volume()
         self.storage.rate = self.player.get_rate()
         self.storage.save()
@@ -302,12 +303,12 @@ class Index():
                 play_display_name = play_display_name[:19]
 
             self.display_info(
-                '$ %s' % get_pretty_str(play_display_name, cursor, max_len), x,
+                '\u266a %s' % get_pretty_str(play_display_name, cursor, max_len), x,
                 y, 5)
 
-        self.display_info('[速率: %s]' % round(self.storage.rate, 1), x + 42,
+        self.display_info('[\u2261 速率: %s]' % round(self.storage.rate, 1), x + 42,
                           y - 1, 5)
-        self.display_info('[音量: %s]' % self.storage.volume, x + 42, y, 5)
+        self.display_info('[\u25c0 音量: %s]' % self.storage.volume, x + 42, y, 5)
         self.display_info(
             '[%s%s][%s/%s]' %
             ('=' * play_progress_bar_len, '-' *
@@ -561,6 +562,12 @@ class Index():
         else:
             # 翻页只修改数据
             self._modify_current_items(history.get('data'))
+        self.select_index = 0
+
+    def display_local_history_list(self):
+        """显示本地历史记录"""
+        history = self.storage.local_history
+        self.menu_stack.push({'type': 2, 'items': history})
         self.select_index = 0
 
     def display_chapter_list(self, album, is_page=False):

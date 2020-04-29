@@ -5,7 +5,7 @@ import logging
 from xmlabox.base import Track
 
 LOG = logging.getLogger(__name__)
-content = {'cookie': None, 'current_play': None, 'volume': 0, 'rate': 1.0}
+content = {'cookie': None, 'volume': 0, 'rate': 1.0, 'local_history': []}
 default_path = os.path.join(os.getenv('HOME'), '.xmlabox/xmla.json')
 
 
@@ -27,18 +27,18 @@ class Storage:
         with open(self.file_path, 'r') as f:
             stor = json.load(f)
             self._cookie = stor.get('cookie')
-            self._current_paly = stor.get('current_play')
             self._volume = stor.get('volume')
             self._rate = stor.get('rate')
+            self._local_history = stor.get('local_history')
 
     def save(self):
         with open(self.file_path, 'w') as f:
             f.write(
                 json.dumps({
                     'cookie': self._cookie,
-                    'current_play': self._current_paly,
                     'volume': self._volume,
-                    'rate': self._rate
+                    'rate': self._rate,
+                    'local_history': self._local_history
                 }))
 
     @property
@@ -51,13 +51,9 @@ class Storage:
 
     @property
     def current_play(self):
-        if self._current_paly:
-            return Track(**self._current_paly)
+        if self._local_history:
+            return Track(**self._local_history[0])
         return {}
-
-    @current_play.setter
-    def current_paly(self, current_paly):
-        self._current_paly = current_paly.json()
 
     @property
     def volume(self):
@@ -74,3 +70,16 @@ class Storage:
     @rate.setter
     def rate(self, rate):
         self._rate = rate
+
+    @property
+    def local_history(self):
+        return [Track(**i) for i in self._local_history]
+
+    def add_current_play(self, play):
+        for i in range(len(self._local_history)):
+            LOG.debug(play.album_id)
+            LOG.debug(self._local_history[i].get('album_id'))
+            if play.album_id == self._local_history[i].get('album_id'):
+                self._local_history.pop(i)
+                break
+        self._local_history.insert(0, play.json())
