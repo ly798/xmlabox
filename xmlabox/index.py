@@ -148,12 +148,14 @@ class Index():
         LOG.debug('play next...')
         self.current_play = self.ximalaya.get_next_track(self.current_play.id)
         self.is_change = 1
+        self.log_string = '播放下一首'
 
     @vlc.callbackmethod
     def play_pre_cb(self, event):
         LOG.debug('play pre...')
         self.current_play = self.ximalaya.get_pre_track(self.current_play.id)
         self.is_change = 1
+        self.log_string = '播放上一首'
 
     @vlc.callbackmethod
     def update_time(self, event):
@@ -334,38 +336,34 @@ class Index():
 
     def _display_help(self):
         x = self._x + 27
-        y = self._y + 6
+        y = self._y + 7
+        self.display_info('-' * 27, x, y - 1, 5)
+        help_items = [
+            ('?', '帮助'),
+            ('Backspace', '返回上一步'),
+            ('+', '音量增加'),
+            ('-', '音量减小'),
+            (')', '速率增加'),
+            ('(', '速率减小'),
+            ('->', '快进'),
+            ('<-', '快退'),
+            ('>', '上一首'),
+            ('<', '下一首'),
+            ('q', '退出'),
+        ]
+        for k, v in help_items:
+            self.display_info(
+                '|%s%s%s%s%s|' %
+                (' ' * (10 - wcswidth(k)), k, ' ' * 5, v, ' ' *
+                 (10 - wcswidth(v))), x, y, 5)
+            y += 1
         self.display_info('-' * 27, x, y, 5)
-        self.display_info('|%s?%s%s%s|' % (' ' * 9, ' ' * 5, '帮助', ' ' * 6), x,
-                          y + 1, 5)
-        self.display_info(
-            '|%sBackspace%s%s%s|' % (' ' * 1, ' ' * 5, '返回上一步', ' ' * 0), x,
-            y + 2, 5)
-        self.display_info('|%s+%s%s%s|' % (' ' * 9, ' ' * 5, '音量增加', ' ' * 2),
-                          x, y + 3, 5)
-        self.display_info('|%s-%s%s%s|' % (' ' * 9, ' ' * 5, '音量减小', ' ' * 2),
-                          x, y + 4, 5)
-        self.display_info('|%s+%s%s%s|' % (' ' * 9, ' ' * 5, '速率增加', ' ' * 2),
-                          x, y + 5, 5)
-        self.display_info('|%s-%s%s%s|' % (' ' * 9, ' ' * 5, '速率减小', ' ' * 2),
-                          x, y + 6, 5)
-        self.display_info('|%s->%s%s%s|' % (' ' * 8, ' ' * 5, '快进', ' ' * 6),
-                          x, y + 7, 5)
-        self.display_info('|%s<-%s%s%s|' % (' ' * 8, ' ' * 5, '快退', ' ' * 6),
-                          x, y + 8, 5)
-        self.display_info('|%s<%s%s%s|' % (' ' * 9, ' ' * 5, '上一首', ' ' * 4),
-                          x, y + 9, 5)
-        self.display_info('|%s>%s%s%s|' % (' ' * 9, ' ' * 5, '下一首', ' ' * 4),
-                          x, y + 10, 5)
-        self.display_info('|%sq%s%s%s|' % (' ' * 9, ' ' * 5, '退出', ' ' * 6), x,
-                          y + 11, 5)
-        self.display_info('-' * 27, x, y + 12, 5)
 
     def display_footer(self):
         x = self._x
         y = self._y + 25
         self.display_info('-' * self.weight, x, y)
-        self.display_info('key: %s' % self.key, x, y + 1, 1)
+        self.display_info(self.key, x, y + 1, 1)
         log_tmp_x = x + self.weight - wcswidth(self.log_string)
         self.display_info(self.log_string, log_tmp_x, y + 1, 1)
 
