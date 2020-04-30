@@ -94,8 +94,8 @@ class Index():
 
         self._init_player()
 
-        # 是否下一首
-        self.is_next = 0
+        # 是否上/下一首
+        self.is_change = 0
 
         _thread.start_new_thread(self._bg, ())
 
@@ -129,10 +129,10 @@ class Index():
 
     def _bg(self):
         while True:
-            # 是否下一首
-            if self.is_next == 1:
+            # 是否上/下一首
+            if self.is_change == 1:
                 self._play(isnew=True)
-                self.is_next = 0
+                self.is_change = 0
             # 标题移动
             if self.current_play and self.player.is_playing():
                 self.current_play.cursor = self.current_play.cursor + 1 \
@@ -147,7 +147,13 @@ class Index():
     def play_next_cb(self, event):
         LOG.debug('play next...')
         self.current_play = self.ximalaya.get_next_track(self.current_play.id)
-        self.is_next = 1
+        self.is_change = 1
+
+    @vlc.callbackmethod
+    def play_pre_cb(self, event):
+        LOG.debug('play pre...')
+        self.current_play = self.ximalaya.get_pre_track(self.current_play.id)
+        self.is_change = 1
 
     @vlc.callbackmethod
     def update_time(self, event):
@@ -303,12 +309,13 @@ class Index():
                 play_display_name = play_display_name[:19]
 
             self.display_info(
-                '\u266a %s' % get_pretty_str(play_display_name, cursor, max_len), x,
-                y, 5)
+                '\u266a %s' %
+                get_pretty_str(play_display_name, cursor, max_len), x, y, 5)
 
-        self.display_info('[\u2261 速率: %s]' % round(self.storage.rate, 1), x + 42,
-                          y - 1, 5)
-        self.display_info('[\u25c0 音量: %s]' % self.storage.volume, x + 42, y, 5)
+        self.display_info('[\u2261 速率: %s]' % round(self.storage.rate, 1),
+                          x + 42, y - 1, 5)
+        self.display_info('[\u25c0 音量: %s]' % self.storage.volume, x + 42, y,
+                          5)
         self.display_info(
             '[%s%s][%s/%s]' %
             ('=' * play_progress_bar_len, '-' *
@@ -346,11 +353,13 @@ class Index():
                           x, y + 7, 5)
         self.display_info('|%s<-%s%s%s|' % (' ' * 8, ' ' * 5, '快退', ' ' * 6),
                           x, y + 8, 5)
-        self.display_info('|%s>%s%s%s|' % (' ' * 9, ' ' * 5, '下一首', ' ' * 4),
+        self.display_info('|%s<%s%s%s|' % (' ' * 9, ' ' * 5, '上一首', ' ' * 4),
                           x, y + 9, 5)
+        self.display_info('|%s>%s%s%s|' % (' ' * 9, ' ' * 5, '下一首', ' ' * 4),
+                          x, y + 10, 5)
         self.display_info('|%sq%s%s%s|' % (' ' * 9, ' ' * 5, '退出', ' ' * 6), x,
-                          y + 10, 5)
-        self.display_info('-' * 27, x, y + 11, 5)
+                          y + 11, 5)
+        self.display_info('-' * 27, x, y + 12, 5)
 
     def display_footer(self):
         x = self._x
@@ -497,6 +506,9 @@ class Index():
             # 下一首
             elif key == ord('>') or key == 62:
                 self.play_next_cb(event=None)
+            # 上一首
+            elif key == ord('<') or key == 60:
+                self.play_pre_cb(event=None)
 
             # 快进/快退
             elif key == 261:

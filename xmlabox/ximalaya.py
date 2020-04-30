@@ -167,6 +167,20 @@ class ximalaya(object):
         track = _tmp.get('data')[0]
         return track
 
+    def get_pre_track(self, id):
+        url = "https://www.ximalaya.com/revision/play/v1/show?id=%s&sort=0&size=10&ptype=1" % id
+        info = self.session.get(url).json()
+        index = -1
+        album_id = -1
+        for i in info.get('data').get('tracksAudioPlay'):
+            if str(i.get('trackId')) == str(id):
+                index = i.get('index')
+                album_id = i.get('albumId')
+        LOG.debug('get pre index: %s' % str(index - 1))
+        _tmp = self.get_track_list(album_id, index - 1, 1)
+        track = _tmp.get('data')[0]
+        return track
+
     def get_track_token(self, id):
         url = "https://www.ximalaya.com/nyx/v2/track/count/web"
         _headers = {
