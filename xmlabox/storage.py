@@ -2,8 +2,6 @@ import os
 import logging
 import pickle
 
-from xmlabox.base import Track
-
 LOG = logging.getLogger(__name__)
 default_path = os.path.join(os.getenv('HOME'), '.xmlabox/xmla.data')
 

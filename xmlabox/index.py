@@ -231,7 +231,7 @@ class Index():
             tmp_x = x + self.weight - wcswidth(userstr)
             self.display_info(userstr, tmp_x, y, 1)
 
-        self.display_info('-' * self.weight, x, y + 1)
+        self.display_info('\u2500' * self.weight, x, y + 1)
         nar_str = ''
         for obj in self.menu_stack.get_raw():
             if obj.get('type') == 0:
@@ -243,7 +243,7 @@ class Index():
             elif obj.get('type') == 3:
                 nar_str += ' / Exit'
         self.display_info(nar_str, x, y + 2)
-        self.display_info('-' * self.weight, x, y + 3)
+        self.display_info('\u2500' * self.weight, x, y + 3)
 
     def display_body(self):
         self._display_menu()
@@ -304,7 +304,7 @@ class Index():
                                         self.current_play.position)
 
             cursor = self.current_play.cursor
-            max_len = 20
+            max_len = 24
             play_display_name = self.current_play.name
             # play_display_name 长度不能大于 max_len
             if len(play_display_name) >= max_len:
@@ -316,8 +316,8 @@ class Index():
 
         self.display_info('[\u2261 速率: %s]' % round(self.storage.rate, 1),
                           x + 42, y - 1, 5)
-        self.display_info('[\u25c0 音量: %s]' % self.storage.volume, x + 42, y,
-                          5)
+        self.display_info('[\u25c0 音量: %s' % self.storage.volume, x + 42, y, 5)
+        self.display_info(']', x + 54, y, 5)
         self.display_info(
             '[%s%s][%s/%s]' %
             ('=' * play_progress_bar_len, '-' *
@@ -362,7 +362,7 @@ class Index():
     def display_footer(self):
         x = self._x
         y = self._y + 25
-        self.display_info('-' * self.weight, x, y)
+        self.display_info('\u2500' * self.weight, x, y)
         self.display_info(self.key, x, y + 1, 1)
         log_tmp_x = x + self.weight - wcswidth(self.log_string)
         self.display_info(self.log_string, log_tmp_x, y + 1, 1)
