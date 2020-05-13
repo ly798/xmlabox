@@ -13,7 +13,8 @@ setup(name=PACKAGE,
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-          'setuptools', 'python-vlc', 'requests', 'wcwidth', 'selenium'
+          'setuptools', 'python-vlc', 'requests', 'wcwidth', 'selenium',
+          'webdriver_manager'
       ],
       entry_points={
           'console_scripts': ['xmlabox = xmlabox.main:main'],

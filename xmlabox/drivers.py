@@ -88,6 +88,17 @@ def get_browerdriver_path(brower='chrome'):
         return _get_firefoxdriver_path()
 
 
+def get_browerdriver_path2(brower='chrome'):
+    if brower == 'chrome':
+        from webdriver_manager.chrome import ChromeDriverManager
+        return ChromeDriverManager().install()
+    elif brower == 'firefox':
+        from webdriver_manager.firefox import GeckoDriverManager
+        return GeckoDriverManager().install()
+
+
 if __name__ == "__main__":
-    get_browerdriver_path('chrome')
-    get_browerdriver_path('firefox')
+    # get_browerdriver_path('chrome')
+    # get_browerdriver_path('firefox')
+    get_browerdriver_path2('chrome')
+    get_browerdriver_path2('firefox')
