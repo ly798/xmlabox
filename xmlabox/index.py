@@ -131,7 +131,7 @@ class Index():
         while True:
             # 是否上/下一首
             if self.is_change == 1:
-                self._play(isnew=True)
+                self._play()
                 self.is_change = 0
             # 标题移动
             if self.current_play and self.player.is_playing():
@@ -446,7 +446,7 @@ class Index():
                     LOG.debug('select meun: %s' % self.select_item)
                     self.current_play = self.select_item
                     self.log_string = 'play %s' % self.select_item.display_name
-                    self._play(isnew=True)
+                    self._play()
                 elif self.current_meun_type == 3:
                     LOG.debug('exit')
                     if self.islogin:
@@ -593,7 +593,7 @@ class Index():
             self._modify_current_items(tracks.get('data'))
         self.select_index = 0
 
-    def _play(self, isnew=False):
+    def _play(self):
         if not self.current_play.src:
             self.current_play.src = self.ximalaya.get_track_src(
                 self.current_play.id)
@@ -602,6 +602,6 @@ class Index():
                   (self.current_play.name, self.current_play.src,
                    self.current_play.time, self.current_play.length,
                    self.player.play()))
-        if not isnew:
+        if self.current_play.time:
             self.player.set_time(self.current_play.time)
         self.save_history()
