@@ -1,3 +1,4 @@
+import execjs
 import requests
 import time
 import hashlib
@@ -7,6 +8,7 @@ import logging
 from pprint import pprint
 
 from xmlabox.base import Album, Track, User
+from xmlabox.data import get_vjs_path
 
 LOG = logging.getLogger(__name__)
 
@@ -116,7 +118,22 @@ class ximalaya(object):
         url = "https://www.ximalaya.com/revision/play/v1/audio?id=%s&ptype=%s" % (
             id, type)
         info = self.session.get(url).json()
-        return info.get('data').get('src')
+        src = info.get('data').get('src')
+        if not src:
+            src = self.get_vip_track_src(id)
+
+        return src
+
+    def get_vip_track_src(self, id):
+        url = "https://mpay.ximalaya.com/mobile/track/pay/%s?device=pc&isBackend=true&_=%s" % (
+            id, str(round(time.time() * 1000)))
+        # info = self.session.get(url).json()
+        # 不能使用session? 404
+        info = requests.get(url).json()
+        with open(get_vjs_path(), 'r') as f:
+            js_code = f.read()
+        src = execjs.compile(js_code).call('get_player_url', info)
+        return src
 
     def get_album_info(self, id):
         url = "https://www.ximalaya.com/revision/album?albumId=%s" % id

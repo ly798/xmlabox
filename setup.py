@@ -14,7 +14,7 @@ setup(name=PACKAGE,
       zip_safe=False,
       install_requires=[
           'setuptools', 'python-vlc', 'requests', 'wcwidth', 'selenium',
-          'webdriver_manager'
+          'webdriver_manager', 'PyExecJS'
       ],
       entry_points={
           'console_scripts': ['xmlabox = xmlabox.main:main'],

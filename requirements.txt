@@ -1,10 +1,11 @@
 certifi==2020.4.5.1
 chardet==3.0.4
 idna==2.9
+PyExecJS==1.5.1
 python-vlc==3.0.7110
 requests==2.23.0
 selenium==3.141.0
 urllib3==1.25.8
 wcwidth==0.1.9
--e git+https://github.com/ly798/xmlabox.git@c74cc650e89a3c73aa4e9828b82d9feff622d54f#egg=xmlabox
+webdriver-manager==2.4.0
 yapf==0.29.0
