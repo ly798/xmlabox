@@ -594,9 +594,9 @@ class Index():
         self.select_index = 0
 
     def _play(self):
-        if not self.current_play.src:
-            self.current_play.src = self.ximalaya.get_track_src(
-                self.current_play.id)
+        # if not self.current_play.src:
+        self.current_play.src = self.ximalaya.get_track_src(
+            self.current_play.id)
         self.player.set_uri(self.current_play.src)
         LOG.debug('start play: %s, src: %s, time: %s, length: %s, ret: %s' %
                   (self.current_play.name, self.current_play.src,
