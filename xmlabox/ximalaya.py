@@ -181,6 +181,10 @@ class ximalaya(object):
                 album_id = i.get('albumId')
         LOG.debug('get next index: %s' % str(index + 1))
         _tmp = self.get_track_list(album_id, index + 1, 1)
+
+        if not _tmp.get('data'):
+            return None
+
         track = _tmp.get('data')[0]
         return track
 

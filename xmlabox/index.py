@@ -131,6 +131,7 @@ class Index():
         while True:
             # 是否上/下一首
             if self.is_change == 1:
+                self.log_string = "正在缓冲..."
                 self._play()
                 self.is_change = 0
             # 标题移动
@@ -146,7 +147,11 @@ class Index():
     @vlc.callbackmethod
     def play_next_cb(self, event):
         LOG.debug('play next...')
-        self.current_play = self.ximalaya.get_next_track(self.current_play.id)
+        new_play = self.ximalaya.get_next_track(self.current_play.id)
+        if not new_play:
+            self.log_string = '没有更多'
+            return
+        self.current_play = new_play
         self.is_change = 1
         self.log_string = '播放下一首'
 
@@ -445,7 +450,7 @@ class Index():
                 elif self.current_meun_type == 2:
                     LOG.debug('select meun: %s' % self.select_item)
                     self.current_play = self.select_item
-                    self.log_string = 'play %s' % self.select_item.display_name
+                    self.log_string = "正在缓冲..."
                     self._play()
                 elif self.current_meun_type == 3:
                     LOG.debug('exit')
@@ -481,6 +486,7 @@ class Index():
                         if self.player.has_url():
                             self.player.resume()
                         else:
+                            self.log_string = "正在缓冲..."
                             self._play()
                 else:
                     self.log_string = '无法播放'
@@ -604,4 +610,5 @@ class Index():
                    self.player.play()))
         # if self.current_play.time:
         self.player.set_time(self.current_play.time)
+        self.log_string = 'play %s' % self.current_play.display_name
         self.save_history()
