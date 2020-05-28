@@ -602,6 +602,6 @@ class Index():
                   (self.current_play.name, self.current_play.src,
                    self.current_play.time, self.current_play.length,
                    self.player.play()))
-        if self.current_play.time:
-            self.player.set_time(self.current_play.time)
+        # if self.current_play.time:
+        self.player.set_time(self.current_play.time)
         self.save_history()
