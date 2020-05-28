@@ -11,7 +11,7 @@ from wcwidth import wcswidth
 
 from xmlabox.utils import Stack, get_pretty_str, sec2time
 from xmlabox.ximalaya import ximalaya
-from xmlabox.storage import Storage
+from xmlabox.storage import Storage, local_track_cache
 from xmlabox.base import Item, User
 from xmlabox.player import Player
 from xmlabox.browser import Brower
@@ -597,7 +597,7 @@ class Index():
         # if not self.current_play.src:
         self.current_play.src = self.ximalaya.get_track_src(
             self.current_play.id)
-        self.player.set_uri(self.current_play.src)
+        self.player.set_uri(local_track_cache(self.current_play.src))
         LOG.debug('start play: %s, src: %s, time: %s, length: %s, ret: %s' %
                   (self.current_play.name, self.current_play.src,
                    self.current_play.time, self.current_play.length,

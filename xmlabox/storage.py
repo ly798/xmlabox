@@ -1,9 +1,17 @@
 import os
 import logging
 import pickle
+import re
+
+import requests
 
 LOG = logging.getLogger(__name__)
 default_path = os.path.join(os.getenv('HOME'), '.xmlabox/xmla.data')
+cache_dirpath = os.path.join(os.getenv('HOME'), '.xmlabox', 'cache')
+headers = {
+    "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.90 Safari/537.36"
+}
 
 
 class Storage:
@@ -76,3 +84,30 @@ class Storage:
                 self._local_history.pop(i)
                 break
         self._local_history.insert(0, play)
+
+
+def local_track_cache(url, local=True):
+    if not local:
+        return url
+    m = re.match('^.+?/([\w-]+\.m4a).*?$', url)
+    if not m:
+        return
+    path = os.path.join(cache_dirpath, m.groups()[0])
+
+    if not os.path.exists(cache_dirpath):
+        os.makedirs(cache_dirpath)
+
+    if not os.path.exists(path):
+        # 下载
+        LOG.debug('downlond file: %s' % url)
+        res = requests.get(url, headers=headers, stream=True)
+        with open(path, 'wb') as f:
+            for chunk in res.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+        LOG.debug('downlond success: %s' % path)
+    else:
+        pass
+        # TODO 判断大小，过期时间
+
+    return path
