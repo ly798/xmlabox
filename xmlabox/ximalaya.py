@@ -51,7 +51,6 @@ class ximalaya(object):
         serverTime = self.getServerTime()
         sigin = self.getSign(serverTime)
         self.session.headers.update({"xm-sign": sigin})
-        print(sigin)
 
     def get_current_user(self):
         # 当前用户
@@ -136,6 +135,7 @@ class ximalaya(object):
         return src
 
     def get_album_info(self, id):
+        self.sign()
         url = "https://www.ximalaya.com/revision/album?albumId=%s" % id
         info = self.session.get(url).json().get('data')
         return Album(name=info.get('mainInfo').get('albumTitle'),

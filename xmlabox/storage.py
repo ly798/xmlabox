@@ -86,11 +86,13 @@ class Storage:
         self._local_history.insert(0, play)
 
 
-def local_track_cache(url, local=True):
+def local_track_cache(url, name=None, local=True):
+    LOG.debug("begin cache: %s" % url)
     if not local:
         return url
     m = re.match('^.+?/([\w-]+\.m4a).*?$', url)
     if not m:
+        LOG.debug("can't match")
         return
     path = os.path.join(cache_dirpath, m.groups()[0])
 
@@ -101,13 +103,19 @@ def local_track_cache(url, local=True):
         # 下载
         LOG.debug('downlond file: %s' % url)
         res = requests.get(url, headers=headers, stream=True)
+        if name:
+            tmpf = open(os.path.join(cache_dirpath, '%s.m4a' % name), 'wb')
         with open(path, 'wb') as f:
             for chunk in res.iter_content(chunk_size=8192):
                 if chunk:
                     f.write(chunk)
+                    if name:
+                        tmpf.write(chunk)
+        if name:
+            tmpf.close()
         LOG.debug('downlond success: %s' % path)
     else:
-        pass
+        LOG.debug('cache exist: %s' % path)
         # TODO 判断大小，过期时间
 
     return path
