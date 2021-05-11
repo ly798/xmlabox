@@ -11,3 +11,8 @@ xmlabox
 apt install vlc
 pip install xmlabox
 ```
+
+todo
+----
+
+设置decoder avcodec

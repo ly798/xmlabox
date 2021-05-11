@@ -108,7 +108,7 @@ class Index():
 
     def _init_player(self):
         LOG.debug('init vlc player')
-        self.player = Player()
+        self.player = Player("--no-ignore-config")
         LOG.debug('set vlc volume: %s' % self.storage.volume)
         # 新建vlc对象后在未播放前都获取的音量均为0，从之前的记录中获取并设置
         self.player.set_volume(self.storage.volume)
