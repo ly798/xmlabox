@@ -603,8 +603,7 @@ class Index():
         # if not self.current_play.src:
         self.current_play.src = self.ximalaya.get_track_src(
             self.current_play.id)
-        self.player.set_uri(
-            local_track_cache(self.current_play.src, self.current_play.name))
+        self.player.set_uri(local_track_cache(self.current_play.src))
         LOG.debug('start play: %s, src: %s, time: %s, length: %s, ret: %s' %
                   (self.current_play.name, self.current_play.src,
                    self.current_play.time, self.current_play.length,
