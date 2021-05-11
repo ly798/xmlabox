@@ -33,7 +33,7 @@ class ximalaya(object):
         response = self.session.get(serverTimeUrl)
         return response.text
 
-    def getSign(self, serverTime):
+    def _getSign(self, serverTime):
         """
         生成 xm-sign
         规则是 md5(ximalaya-服务器时间戳)(100以内随机数)服务器时间戳(100以内随机数)现在时间戳
@@ -50,10 +50,11 @@ class ximalaya(object):
 
     def sign(self):
         serverTime = self.getServerTime()
-        sigin = self.getSign(serverTime)
+        sigin = self._getSign(serverTime)
         self.session.headers.update({"xm-sign": sigin})
 
     def get_current_user(self):
+        self.sign()
         # 当前用户
         url = 'https://www.ximalaya.com/revision/main/getCurrentUser'
         info = self.session.get(url).json()
@@ -62,12 +63,14 @@ class ximalaya(object):
         return user
 
     def get_current_user_info(self):
+        self.sign()
         # 用户详细信息
         url = 'https://www.ximalaya.com/revision/my/getCurrentUserInfo'
         info = self.session.get(url).json()
         return info
 
     def get_subscribe(self):
+        self.sign()
         # 订阅
         #TODO: 分页
         url = "https://www.ximalaya.com/revision/album/v1/sub/comprehensive?num=1&size=30&subType=2&category=all"
@@ -85,6 +88,7 @@ class ximalaya(object):
         return result
 
     def get_history(self, page_num=1, page_size=10):
+        self.sign()
         # 历史
         url = "https://www.ximalaya.com/revision/my/getListened"
         info = self.session.get(url).json()
@@ -114,6 +118,7 @@ class ximalaya(object):
         }
 
     def get_track_src(self, id, type=1):
+        self.sign()
         """获取播放src"""
         url = "https://www.ximalaya.com/revision/play/v1/audio?id=%s&ptype=%s" % (
             id, type)
@@ -125,6 +130,7 @@ class ximalaya(object):
         return src
 
     def get_vip_track_src(self, id):
+        self.sign()
         url = "https://mpay.ximalaya.com/mobile/track/pay/%s?device=pc&isBackend=true&_=%s" % (
             id, str(round(time.time() * 1000)))
         # info = self.session.get(url).json()
@@ -136,6 +142,7 @@ class ximalaya(object):
         return src
 
     def get_album_info(self, id):
+        self.sign()
         url = "https://www.ximalaya.com/revision/album?albumId=%s" % id
         LOG.info(self.session.get(url).text)
         info = self.session.get(url).json().get('data')
@@ -146,6 +153,7 @@ class ximalaya(object):
                      track_count=info.get('tracksInfo').get('trackTotalCount'))
 
     def get_track_list(self, id, page_num=1, page_size=10):
+        self.sign()
         #获取专辑的所有章节
         url = "https://www.ximalaya.com/revision/album/v1/getTracksList?albumId=%s&pageNum=%s&pageSize=%s" % (
             id, page_num, page_size)
@@ -172,6 +180,7 @@ class ximalaya(object):
         }
 
     def get_next_track(self, id):
+        self.sign()
         url = "https://www.ximalaya.com/revision/play/v1/show?id=%s&sort=0&size=10&ptype=1" % id
         info = self.session.get(url).json()
         index = -1
@@ -190,6 +199,7 @@ class ximalaya(object):
         return track
 
     def get_pre_track(self, id):
+        self.sign()
         url = "https://www.ximalaya.com/revision/play/v1/show?id=%s&sort=0&size=10&ptype=1" % id
         info = self.session.get(url).json()
         index = -1
@@ -204,6 +214,7 @@ class ximalaya(object):
         return track
 
     def get_track_token(self, id):
+        self.sign()
         url = "https://www.ximalaya.com/nyx/v2/track/count/web"
         _headers = {
             "Host": "www.ximalaya.com",
@@ -215,6 +226,7 @@ class ximalaya(object):
         return info.get('data').get('token')
 
     def commit_process(self, id, sec):
+        self.sign()
         url = "https://www.ximalaya.com/nyx/v2/track/statistic/web"
         token = self.get_track_token(id)
         now = round(time.time() * 1000)
