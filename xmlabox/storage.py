@@ -2,6 +2,7 @@ import os
 import logging
 import pickle
 import re
+import time
 
 import requests
 
@@ -12,6 +13,8 @@ headers = {
     "User-Agent":
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.90 Safari/537.36"
 }
+
+expire_time = 7 * 3600
 
 
 class Storage:
@@ -91,6 +94,7 @@ def local_track_cache(url, local=True):
         return url
     m = re.match('^.+?/([\w-]+\.m4a).*?$', url)
     if not m:
+        LOG.debug("can't match")
         return
     path = os.path.join(cache_dirpath, m.groups()[0])
 
@@ -107,7 +111,18 @@ def local_track_cache(url, local=True):
                     f.write(chunk)
         LOG.debug('downlond success: %s' % path)
     else:
-        pass
-        # TODO 判断大小，过期时间
+        LOG.debug('cache exist: %s' % path)
+
+    # 过期时间
+    now = time.time()
+    for i in os.listdir(cache_dirpath):
+        tmp_file = os.path.join(cache_dirpath, i)
+        if not tmp_file == path:
+            t = os.path.getatime(tmp_file)
+            if now - t >= expire_time:
+                LOG.info('delete expire file: %s' % tmp_file)
+                os.remove(tmp_file)
+
+    # TODO 判断大小
 
     return path
