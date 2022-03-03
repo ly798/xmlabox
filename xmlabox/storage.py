@@ -88,6 +88,24 @@ class Storage:
                 break
         self._local_history.insert(0, play)
 
+    def import_cookie_file(self, cookie_file):
+        if not os.path.exists(cookie_file):
+            print('No such file: %s' % cookie_file)
+            return
+        with open(cookie_file, 'r') as f:
+            self._cookie = f.read().strip()
+            print(self._cookie)
+            self.save()
+
+    def dump(self):
+        return {
+                   "cookie": self.cookie,
+                   "current_play": self.current_play,
+                   "volume": self.volume,
+                   "rate": self.rate,
+                   "local_history": self.local_history
+               }
+
 
 def local_track_cache(url, local=True):
     if not local:

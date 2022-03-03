@@ -39,10 +39,26 @@ def main():
         "--version",
         help="show this version and exit",
         action="store_true")
+    parser.add_argument(
+        "-d",
+        "--dump",
+        help="show this storage and exit",
+        action="store_true")
+    parser.add_argument(
+        '-i',
+        help="import cookie file",
+        metavar="cookie")
     args = parser.parse_args()
 
     if args.version:
         print('version: %s' % __version__)
+        sys.exit()
+    if args.dump:
+        from pprint import pprint
+        pprint(Storage().dump())
+        sys.exit()
+    if args.i:
+        Storage().import_cookie_file(args.i)
         sys.exit()
 
     try:

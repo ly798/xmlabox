@@ -60,7 +60,7 @@ class Brower:
                 else:
                     index.logining_cursor += 1
 
-            if self.driver.current_url == "https://www.ximalaya.com/my/subscribed/":
+            if self.driver.current_url.strip('/') == "https://www.ximalaya.com/my/subscribed":
                 for i in self.driver.get_cookies():
                     cookie += '%s=%s; ' % (i.get('name'), i.get('value'))
                 break
